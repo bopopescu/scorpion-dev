@@ -32,22 +32,12 @@ except NameError: pass
 
 print('''
     Installing Scorpion Server Manager
-
-             (        )
-             O        O
-             ()      ()
-              Oo.nn.oO
-               _mmmm_
-             \/_mmmm_\/
-             \/_mmmm_\/
-             \/_mmmm_\/
-             \/ mmmm \/
-                 nn
-                 ()   scorpion.io
-                 ()
-                  ()    /
-                   ()__()
-                    '--'
+                               _               _
+   ______________  _________  (_)___  ____    (_)___
+  / ___/ ___/ __ \/ ___/ __ \/ / __ \/ __ \  / / __ \
+ (__  ) /__/ /_/ / /  / /_/ / / /_/ / / / / / / /_/ /
+/____/\___/\____/_/  / .___/_/\____/_/ /_(_)_/\____/
+                    /_/
 ''')
 
 parser = argparse.ArgumentParser(description='AWS Credentials for saving and restoring backups.')
