@@ -30,6 +30,28 @@ import argparse
 try: input = raw_input
 except NameError: pass
 
+print('''
+
+    Installing Scorpion Server Manager
+
+             (        )
+             O        O
+             ()      ()
+              Oo.nn.oO
+               _mmmm_
+             \/_mmmm_\/
+             \/_mmmm_\/
+             \/_mmmm_\/
+             \/ mmmm \/
+                 nn
+                 ()   scorpion.io
+                 ()
+                  ()    /
+                   ()__()
+                    '--'
+
+''')
+
 parser = argparse.ArgumentParser(description='AWS Credentials for saving and restoring backups.')
 parser.add_argument('--aws-access-key-id')
 parser.add_argument('--aws-secret-access-key')
@@ -54,6 +76,6 @@ print AWS_SAK
 print('Complete')
 
 try:
-    os.remove(scorpion-install.py)
+    os.remove('scorpion-install.py')
 except OSError:
     pass
