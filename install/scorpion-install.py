@@ -31,7 +31,6 @@ try: input = raw_input
 except NameError: pass
 
 print('''
-
     Installing Scorpion Server Manager
 
              (        )
@@ -49,7 +48,6 @@ print('''
                   ()    /
                    ()__()
                     '--'
-
 ''')
 
 parser = argparse.ArgumentParser(description='AWS Credentials for saving and restoring backups.')
