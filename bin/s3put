@@ -22,10 +22,13 @@
 #
 import getopt
 import sys
+sys.path.append('../libraries')
 import os
 import boto
 
 from boto.compat import six
+
+
 
 try:
     # multipart portions copyright Fabian Topfstedt
