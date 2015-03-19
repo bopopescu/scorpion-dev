@@ -40,6 +40,8 @@ os.environ["AWS_CREDENTIAL_FILE"] = ".awskeys"
 ## Allow the script to move forward regardless of compatibility issues.
 devmode = True
 
+gitlab_install = True
+
 ## Check if dev mode or not.
 if not devmode:
     # Check if Python is > 2.7
@@ -77,6 +79,16 @@ if not devmode:
         '''
         print('#' * 65)
         sys.exit(1)
+
+## Begin Gitlab install
+if gitlab_install:
+    os.system("sudo apt-get install openssh-server")
+    os.system("sudo apt-get install postfix")
+
+    os.system("wget https://downloads-packages.s3.amazonaws.com/ubuntu-14.04/gitlab_7.8.4-omnibus-1_amd64.deb")
+    os.system("sudo dpkg -i gitlab_7.8.4-omnibus-1_amd64.deb")
+
+    os.system("sudo gitlab-ctl reconfigure")
 
 ## Uncheck to see distribution information.
 #print platform.dist()
