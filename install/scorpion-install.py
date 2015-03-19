@@ -30,6 +30,8 @@ import argparse
 try: input = raw_input
 except NameError: pass
 
+gitlab_install = True
+
 print('''
     Installing Scorpion Server Manager
 
