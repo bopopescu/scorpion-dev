@@ -71,6 +71,16 @@ print AWS_SAK
 ## Kick off another script
 #os.system('python hello.py')
 
+## Begin Gitlab install
+if gitlab_install:
+    os.system("sudo apt-get install openssh-server")
+    os.system("sudo apt-get install postfix")
+
+    os.system("wget https://downloads-packages.s3.amazonaws.com/ubuntu-14.04/gitlab_7.8.4-omnibus-1_amd64.deb")
+    os.system("sudo dpkg -i gitlab_7.8.4-omnibus-1_amd64.deb")
+
+    os.system("sudo gitlab-ctl reconfigure")
+
 print('Complete')
 
 try:
