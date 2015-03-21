@@ -1,50 +1,64 @@
 #################################################################
-##
-##        Scorpion Server Manager
-##
-##             (        )
-##             O        O
-##             ()      ()
-##              Oo.nn.oO
-##               _mmmm_
-##             \/_mmmm_\/
-##             \/_mmmm_\/
-##             \/_mmmm_\/
-##             \/ mmmm \/
-##                 nn
-##                 ()   scorpion.io
-##                 ()
-##                  ()    /
-##                   ()__()
-##                    '--'
-##
-## Copyright (c) 2014 the scorpion.io authors. All rights reserved.
-## Use of this source code is governed by a MIT license that can be
-## found in the LICENSE file.
-##
+#
+#        Scorpion Server Manager
+#
+#             (        )
+#             O        O
+#             ()      ()
+#              Oo.nn.oO
+#               _mmmm_
+#             \/_mmmm_\/
+#             \/_mmmm_\/
+#             \/_mmmm_\/
+#             \/ mmmm \/
+#                 nn
+#                 ()   scorpion.io
+#                 ()
+#                  ()    /
+#                   ()__()
+#                    '--'
+#
+# Copyright (c) 2014 the scorpion.io authors. All rights reserved.
+# Use of this source code is governed by a MIT license that can be
+# found in the LICENSE file.
+#
 #################################################################
 
-## Python imports and other
+# Python module imports
 import os
 import argparse
 
+# Make input compatible with Python 3
 try: input = raw_input
 except NameError: pass
 
+
 #################################################################
-## Install options
+# Install options
 #################################################################
 
 # Allow the script to move forward regardless of compatibility issues.
 devmode = True
+
 # Update OS
 os_update = False
+
+# Set Hostname
+set_hostname = True
+
+# Set IP Address?
+set_ipv4 = True
+set_ipv6 = True
+set_localhost = True
+
 # Install Gitlab
 gitlab_install = False
 
+
 #################################################################
-## Kick off installation
+# Kick off installation
 #################################################################
+
 print('''
     Installing Scorpion Server Manager
 
@@ -66,10 +80,10 @@ print('''
 ''')
 
 #################################################################
-## Check Python and OS version
+# Check Python and OS version
 #################################################################
 
-## Check if dev mode or not.
+# Check if dev mode or not.
 if not devmode:
     # Check if Python is > 2.7
     if sys.version_info[:2] < (2, 7):
@@ -83,7 +97,7 @@ if not devmode:
         print('#' * 65)
         sys.exit(1)
 
-    ## Check if windows
+    # Check if windows
     if platform.system() == 'Windows':
         print('#' * 65)
         print '''
@@ -95,7 +109,7 @@ if not devmode:
         print('#' * 65)
         sys.exit(1)
 
-    ## Check if Mac
+    # Check if Mac
     if platform.system() == 'Darwin':
         print('#' * 65)
         print '''
@@ -107,17 +121,19 @@ if not devmode:
         print('#' * 65)
         sys.exit(1)
 
+
 #################################################################
-## Command line arguments
+# Command line arguments
 #################################################################
 
-## Get the arguments from the command line
-parser = argparse.ArgumentParser(description='AWS Credentials for saving and restoring backups.')
+# Get the arguments from the command line
+parser = argparse.ArgumentParser(description='Required information for script to setup scorpion.')
 parser.add_argument('--aws-access-key-id')
 parser.add_argument('--aws-secret-access-key')
 parser.add_argument('--hostname')
 parser.add_argument('--fqdn')
 parser.add_argument('--password')
+parser.add_argument('--serial')
 
 # Parse the arguments
 args = parser.parse_args()
@@ -126,11 +142,13 @@ args = parser.parse_args()
 AWS_AKID = args.aws_access_key_id
 AWS_SAK = args.aws_secret_access_key
 HOSTNAME = args.hostname
-fqdn = args.fqdn
-password = args.password
+FQDN = args.fqdn
+PASSWORD = args.password
+SERIAL = args.serial
+
 
 #################################################################
-## Online backup setup
+# Check Variables.  If not supplied, request input.
 #################################################################
 
 if not AWS_AKID:
@@ -139,39 +157,67 @@ if not AWS_AKID:
 if not AWS_SAK:
     AWS_SAK = input('Enter your AWS Secret Access Key: ')
 
-## Show the AWS Keys
-#print AWS_AKID
-#print AWS_SAK
+if not HOSTNAME:
+    HOSTNAME = input('Enter the hostname you would like to use: ')
+
+if not FQDN:
+    FQDN = input('Enter the FQDN (fully qualified domain name you would like to use: ')
+
+if not PASSWORD:
+    PASSWORD = input('Enter the password you would like to use: ')
+
 
 #################################################################
-## Update OS
+# Update OS
 #################################################################
 
 if os_update:
     os.system("sudo apt-get update")
     os.system("sudo apt-get upgrade -y")
 
-#################################################################
-## Set IP Address
-#################################################################
-
-
 
 #################################################################
-## Set Hostname
+# Set Hostname
 #################################################################
 
-hostnameupdatestring = "%s > /etc/hostname" % (hostname argument2)
-os.system(hostnameupdatestring)
+if set_hostname:
+    hostnameupdatestring = "echo %s > /etc/hostname" % HOSTNAME
+    os.system(hostnameupdatestring)
+    os.system("hostname -F /etc/hostname")
+
 
 #################################################################
-## GitLab Install
+# Set IP Address
 #################################################################
 
-## Kick off another script
-#os.system('python hello.py')
+# Set the IPv4 Address
+if set_ipv4:
+    get_ipv4 = "/sbin/ifconfig eth0 | awk '/inet / { print $2 }' | sed 's/addr://'"
+    ipv4address = os.system(get_ipv4)
+    set_ipv4_command = "echo %s %s %s >> /etc/hosts" % (ipv4address, FQDN, HOSTNAME)
+    os.system(set_ipv4_command)
 
-## Begin Gitlab install
+# Set the IPv6 Address
+if set_ipv6:
+    get_ipv6 = "/sbin/ifconfig eth0 | awk '/inet6 / { print $3;exit; }' | sed 's/addr:// '"
+    ipv6address = os.system(get_ipv6)
+    set_ipv6_command = "echo %s %s %s >> /etc/hosts" % (ipv6address, FQDN, HOSTNAME)
+    os.system(set_ipv6_command)
+
+# Set the localhost Address
+if set_localhost:
+    set_localhost_command = "echo 127.0.0.1 %s >> /etc/hosts" % HOSTNAME
+    os.system(set_localhost_command)
+
+
+#################################################################
+# GitLab Install
+#################################################################
+
+# Kick off another script
+# os.system('python hello.py')
+
+# Begin Gitlab install
 if gitlab_install:
     os.system("sudo apt-get -y install openssh-server")
     os.system("sudo apt-get -y install postfix")
@@ -181,8 +227,9 @@ if gitlab_install:
 
     os.system("sudo gitlab-ctl reconfigure")
 
+
 #################################################################
-## Post install cleanup
+# Post install cleanup
 #################################################################
 
 print('Complete')
