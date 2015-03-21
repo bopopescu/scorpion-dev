@@ -25,8 +25,9 @@
 #################################################################
 
 # Python module imports
-import os
 import argparse
+import os
+import subprocess
 
 # Make input compatible with Python 3
 try: input = raw_input
@@ -195,9 +196,9 @@ if set_ipv4:
     print('*' * 65)
     print " Setting IPv4 Address"
     get_ipv4 = "/sbin/ifconfig eth0 | awk '/inet / { print $2 }' | sed 's/addr://'"
-    ipv4address = os.popen(get_ipv4).read()
+    ipv4address = subprocess.check_output(get_ipv4, shell=True)
     set_ipv4_command = "echo %s %s %s >> /etc/hosts" % (ipv4address, FQDN, HOSTNAME)
-    os.system(set_ipv4_command)
+    subprocess.call(set_ipv4_command, shell=True)
     print " Set IPv4 to %s." % ipv4address
     print('*' * 65)
 
