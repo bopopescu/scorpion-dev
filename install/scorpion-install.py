@@ -203,18 +203,19 @@ def get_ip_address(ifname):
         struct.pack('256s', ifname[:15])
     )[20:24])
 
-ipinfo = get_ip_address('eth0')  # '192.168.0.110'
-print ipinfo
+ipinfo = get_ip_address('eth0')
+#print ipinfo
 
 # Set the IPv4 Address
 if set_ipv4:
     print('*' * 65)
     print " Setting IPv4 Address"
-    get_ipv4 = "/sbin/ifconfig eth0 | awk '/inet / { print $2 }' | sed 's/addr://'"
-    ipv4address = os.system(get_ipv4)
-    print ipv4address
-    print ipv4address[0]
-    set_ipv4_command = "echo %s %s %s >> /etc/hosts" % (ipv4address, FQDN, HOSTNAME)
+#    get_ipv4 = "/sbin/ifconfig eth0 | awk '/inet / { print $2 }' | sed 's/addr://'"
+#    ipv4address = os.system(get_ipv4)
+#    print "*****"
+#    print ipv4address
+#    print "*****"
+    set_ipv4_command = "echo %s %s %s >> /etc/hosts" % (ipinfo, FQDN, HOSTNAME)
     os.system(set_ipv4_command)
     print " Set IPv4 to %s." % ipv4address
     print('*' * 65)
