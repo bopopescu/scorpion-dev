@@ -195,7 +195,7 @@ if set_ipv4:
     print('*' * 65)
     print " Setting IPv4 Address"
     get_ipv4 = "/sbin/ifconfig eth0 | awk '/inet / { print $2 }' | sed 's/addr://'"
-    ipv4address = os.system(get_ipv4)
+    ipv4address = os.popen(get_ipv4).read()
     set_ipv4_command = "echo %s %s %s >> /etc/hosts" % (ipv4address, FQDN, HOSTNAME)
     os.system(set_ipv4_command)
     print " Set IPv4 to %s." % ipv4address
@@ -207,8 +207,8 @@ if set_ipv6:
     print " Setting IPv6 Address"
     get_ipv6 = "/sbin/ifconfig eth0 | awk '/inet6 / { print $3;exit; }' | sed 's/addr:// '"
     ipv6address = os.popen(get_ipv6).read()
-#    set_ipv6_command = "echo %s %s %s >> /etc/hosts" % (ipv6address, FQDN, HOSTNAME)
-#    os.system(set_ipv6_command)
+    set_ipv6_command = "echo %s %s %s >> /etc/hosts" % (ipv6address, FQDN, HOSTNAME)
+    os.system(set_ipv6_command)
     print " Set IPv6 to %s." % ipv6address
     print('*' * 65)
 
