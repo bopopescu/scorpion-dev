@@ -209,7 +209,7 @@ if set_ipv6:
     ipv6address = os.system(get_ipv6)
     set_ipv6_command = "echo %s %s %s >> /etc/hosts" % (ipv6address, FQDN, HOSTNAME)
     os.system(set_ipv6_command)
-    print " Set IPv6 to %s." % ipv6address
+    print " Set IPv6 to %s." % set_ipv6_command
     print('*' * 65)
 
 # Set the localhost Address
