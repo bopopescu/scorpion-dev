@@ -196,7 +196,7 @@ if set_ipv4:
     print('*' * 65)
     print " Setting IPv4 Address"
     get_ipv4 = "/sbin/ifconfig eth0 | awk '/inet / { print $2 }' | sed 's/addr://'"
-    ipv4address = subprocess.check_output(get_ipv4)
+    ipv4address = os.popen(get_ipv4).readlines()
     set_ipv4_command = "echo %s %s %s >> /etc/hosts" % (ipv4address, FQDN, HOSTNAME)
     subprocess.call(set_ipv4_command, shell=True)
     print " Set IPv4 to %s." % ipv4address
