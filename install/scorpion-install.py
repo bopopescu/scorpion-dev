@@ -206,9 +206,9 @@ if set_ipv6:
     print('*' * 65)
     print " Setting IPv6 Address"
     get_ipv6 = "/sbin/ifconfig eth0 | awk '/inet6 / { print $3;exit; }' | sed 's/addr:// '"
-    ipv6address = os.system(get_ipv6)
-    set_ipv6_command = "echo %s %s %s >> /etc/hosts" % (ipv6address, FQDN, HOSTNAME)
-    os.system(set_ipv6_command)
+#    ipv6address = os.system(get_ipv6)
+#    set_ipv6_command = "echo %s %s %s >> /etc/hosts" % (ipv6address, FQDN, HOSTNAME)
+#    os.system(set_ipv6_command)
     print " Set IPv6 to %s." % get_ipv6
     print('*' * 65)
 
@@ -241,7 +241,7 @@ if gitlab_install:
 
 
 #################################################################
-# Post install cleanup
+# Post Install Cleanup
 #################################################################
 
 print('Complete')
