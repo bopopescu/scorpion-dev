@@ -206,7 +206,7 @@ if set_ipv6:
     print('*' * 65)
     print " Setting IPv6 Address"
     get_ipv6 = "/sbin/ifconfig eth0 | awk '/inet6 / { print $3;exit; }' | sed 's/addr:// '"
-    ipv6address = os.popen(get_ipv6)
+    ipv6address = os.popen(get_ipv6).read()
 #    set_ipv6_command = "echo %s %s %s >> /etc/hosts" % (ipv6address, FQDN, HOSTNAME)
 #    os.system(set_ipv6_command)
     print " Set IPv6 to %s." % ipv6address
