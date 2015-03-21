@@ -206,6 +206,17 @@ def get_ip_address(ifname):
 ipinfo = get_ip_address('eth0')
 #print ipinfo
 
+def get_ip6_address(ifname):
+    s = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
+    return socket.inet_ntoa(fcntl.ioctl(
+        s.fileno(),
+        0x8915,  # SIOCGIFADDR
+        struct.pack('256s', ifname[:15])
+    )[20:24])
+
+ip6info = get_ip6_address('eth0')
+print ip6info
+
 # Set the IPv4 Address
 if set_ipv4:
     print('*' * 65)
@@ -217,7 +228,7 @@ if set_ipv4:
 #    print "*****"
     set_ipv4_command = "echo %s %s %s >> /etc/hosts" % (ipinfo, FQDN, HOSTNAME)
     os.system(set_ipv4_command)
-    print " Set IPv4 to %s." % ipv4address
+    print " Set IPv4 to %s." % ipinfo
     print('*' * 65)
 
 # Set the IPv6 Address
