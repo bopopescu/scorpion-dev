@@ -1,8 +1,8 @@
 # Secure MySQL Installation
-aptitude -y install expect
+apt-get -y install expect
 
 // Not required in actual script
-MYSQL_ROOT_PASSWORD=$USERPASS
+MYSQL_ROOT_PASSWORD=$1
 
 SECURE_MYSQL=$(expect -c "
 
@@ -10,7 +10,7 @@ set timeout 10
 spawn mysql_secure_installation
 
 expect \"Enter current password for root (enter for none):\"
-send \"$USERPASS\r\"
+send \"$1\r\"
 
 expect \"Change the root password?\"
 send \"n\r\"
@@ -32,4 +32,4 @@ expect eof
 
 echo "$SECURE_MYSQL"
 
-aptitude -y purge expect
+apt-get -y purge expect

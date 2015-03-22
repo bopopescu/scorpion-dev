@@ -45,21 +45,21 @@ devmode = True
 os_update = False
 
 # Set Hostname
-set_hostname = False
+set_hostname = True
 
 # Networking
-set_ipv4 = False
-set_ipv6 = False
-set_localhost = False
-restart_net_interfaces = False
+set_ipv4 = True
+set_ipv6 = True
+set_localhost = True
+restart_net_interfaces = True
 
 # Software Installs
-scorpion_install = False
-postfix_install = False
+scorpion_install = True
+postfix_install = True
 mysql_install = True
-php_install = False
-nginx_install = False
-supporting_software_install = False
+php_install = True
+nginx_install = True
+supporting_software_install = True
 gitlab_install = False
 
 
@@ -246,15 +246,16 @@ if restart_net_interfaces:
 #################################################################
 
 # Install scorpion requirements
-if not os.path.exists(/scorpion):
+if not os.path.isdir("/scorpion"):
     # Install Git to version control scorpion core
     os.system("apt-get -y install git")
     # Make the directory scorpion will reside
-    os.makedirs(/scorpion)
+    os.makedirs("/scorpion")
     # Git clone the core
     os.system("git clone https://github.com/scorpion/scorpion-dev.git /scorpion")
 else:
-    os.system("git fetch https://github.com/scorpion/scorpion-dev.git /scorpion")
+    # Folder exists, so just update
+    os.system("git -C /scorpion pull")
 
 
 #################################################################
@@ -285,6 +286,9 @@ if mysql_install:
 
     # Set MySQL Password
     os.system("mysqladmin -u root password %s") % PASSWORD
+
+    # Secure the MySQL installation
+    os.system("sh /scorpion/install/mysql_secure.sh %s") % PASSWORD
 
 
 #################################################################
