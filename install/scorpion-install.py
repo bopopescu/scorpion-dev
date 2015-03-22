@@ -47,12 +47,14 @@ os_update = False
 # Set Hostname
 set_hostname = True
 
-# Set IP Address?
+# Networking
 set_ipv4 = True
 set_ipv6 = True
 set_localhost = True
+restart_net_interfaces = False
 
-# Install Gitlab
+# Software Installs
+postfix_install = True
 gitlab_install = False
 
 
@@ -189,7 +191,7 @@ if set_hostname:
 
 
 #################################################################
-# Set IP Address
+# Network Setup
 #################################################################
 
 # Set the IPv4 Address
@@ -226,17 +228,32 @@ if set_localhost:
     print('*' * 65)
 
 # Restart network interfaces
-os.system("ifdown -a")
-os.system("ifup -a")
-os.system("ifup eth0")
+if restart_net_interfaces:
+    print('*' * 65)
+    print " Setting localhost Address"
+    os.system("ifdown -a")
+    os.system("ifup -a")
+    os.system("ifup eth0")
+
+
+#################################################################
+# Postfix Install
+#################################################################
+
+if postfix_install:
+    # Prestage postfix questions with default answers
+    os.system("echo 'postfix postfix/main_mailer_type select Internet Site' | debconf-set-selections")
+    os.system("echo 'postfix postfix/mailname string localhost' | debconf-set-selections")
+    os.system("echo 'postfix postfix/destinations string localhost.localdomain, localhost' | debconf-set-selections")
+
+    # Kick off the install
+    os.system("apt-get -y install postfix")
+    os.system("/usr/sbin/postconf -e 'inet_interfaces = loopback-only'")
 
 
 #################################################################
 # GitLab Install
 #################################################################
-
-# Kick off another script
-# os.system('python hello.py')
 
 # Begin Gitlab install
 if gitlab_install:
