@@ -45,16 +45,21 @@ devmode = True
 os_update = False
 
 # Set Hostname
-set_hostname = True
+set_hostname = False
 
 # Networking
-set_ipv4 = True
-set_ipv6 = True
-set_localhost = True
+set_ipv4 = False
+set_ipv6 = False
+set_localhost = False
 restart_net_interfaces = False
 
 # Software Installs
-postfix_install = True
+scorpion_install = False
+postfix_install = False
+mysql_install = True
+php_install = False
+nginx_install = False
+supporting_software_install = False
 gitlab_install = False
 
 
@@ -237,6 +242,22 @@ if restart_net_interfaces:
 
 
 #################################################################
+# Scorpion Core Install
+#################################################################
+
+# Install scorpion requirements
+if not os.path.exists(/scorpion):
+    # Install Git to version control scorpion core
+    os.system("apt-get -y install git")
+    # Make the directory scorpion will reside
+    os.makedirs(/scorpion)
+    # Git clone the core
+    os.system("git clone https://github.com/scorpion/scorpion-dev.git /scorpion")
+else:
+    os.system("git fetch https://github.com/scorpion/scorpion-dev.git /scorpion")
+
+
+#################################################################
 # Postfix Install
 #################################################################
 
@@ -249,6 +270,52 @@ if postfix_install:
     # Kick off the install
     os.system("apt-get -y install postfix")
     os.system("/usr/sbin/postconf -e 'inet_interfaces = loopback-only'")
+
+
+#################################################################
+# MySQL Install
+#################################################################
+
+if mysql_install:
+    # Make installer non-interactive
+    os.system("export DEBIAN_FRONTEND=noninteractive")
+
+    # Install MySQL
+    os.system("apt-get -q -y install mysql-server")
+
+    # Set MySQL Password
+    os.system("mysqladmin -u root password %s") % PASSWORD
+
+
+#################################################################
+# PHP Install
+#################################################################
+
+if php_install:
+    # Install PHP
+    os.system("apt-get -y install php5-fpm php5-cli php5-curl php5-gd php5-mcrypt php5-mysql php5-sqlite php-apc php-pear php5-tidy php5-imap")
+
+    # Fix PHP5-IMAP extension by creating symbolic link
+    os.system("sudo ln -s ../../mods-available/imap.ini /etc/php5/fpm/conf.d/20-imap.ini")
+
+    # Fix 502 Bad Gateway
+    #sed -i 's@listen = /var/run/php5-fpm.sock@listen = 127.0.0.1:9000@g' /etc/php5/fpm/pool.d/www.conf
+
+
+#################################################################
+# NGINX Install
+#################################################################
+
+if nginx_install:
+    os.system("apt-get -q -y install nginx")
+
+
+#################################################################
+# Helpful System Software
+#################################################################
+
+if supporting_software_install:
+    os.system("apt-get -q -y install htop imagemagick iftop mytop iptraf nmon lynx nmap screen monit mutt")
 
 
 #################################################################
