@@ -42,7 +42,8 @@ except NameError: pass
 devmode = True
 
 # Update OS
-os_update = False
+os_update = True
+os_upgrade = False
 
 # Set Hostname
 set_hostname = True
@@ -181,7 +182,11 @@ if not PASSWORD:
 #################################################################
 
 if os_update:
+    # Update the packages repo
     os.system("sudo apt-get update")
+
+if os_upgrade:
+    # Upgrade installed packages to latest versions
     os.system("sudo apt-get upgrade -y")
 
 
@@ -289,11 +294,12 @@ if mysql_install:
     os.system("apt-get -q -y install mysql-server")
 
     # Set MySQL Password
-    mysql_install_command = "mysqladmin -u root password %s" % PASSWORD
-    os.system(mysql_install_command)
+    mysql_password_set = "mysqladmin -u root password %s" % PASSWORD
+    os.system(mysql_password_set)
 
     # Secure the MySQL installation
-    os.system("sh /scorpion/install/mysql_secure.sh %s") % PASSWORD
+    mysql_install_secure = "sh /scorpion/install/mysql_secure.sh %s" % PASSWORD
+    os.system(mysql_install_secure)
 
 
 #################################################################
