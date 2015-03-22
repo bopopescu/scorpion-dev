@@ -42,26 +42,27 @@ except NameError: pass
 devmode = True
 
 # Update OS
-os_update = True
+os_update = False
 os_upgrade = False
 
 # Set Hostname
-set_hostname = True
+set_hostname = False
 
 # Networking
-set_ipv4 = True
-set_ipv6 = True
-set_localhost = True
-restart_net_interfaces = True
+set_ipv4 = False
+set_ipv6 = False
+set_localhost = False
+restart_net_interfaces = False
 
 # Software Installs
-scorpion_install = True
-postfix_install = True
-mysql_install = True
-php_install = True
-nginx_install = True
-supporting_software_install = True
+scorpion_install = False
+postfix_install = False
+mysql_install = False
+php_install = False
+nginx_install = False
+supporting_software_install = False
 gitlab_install = False
+s3cmd_install = True
 
 
 #################################################################
@@ -298,7 +299,7 @@ if mysql_install:
     os.system(mysql_password_set)
 
     # Secure the MySQL installation
-    mysql_install_secure = "sh /scorpion/install/mysql_secure.sh %s" % PASSWORD
+    mysql_install_secure = "sudo sh /scorpion/install/mysql_secure.sh %s" % PASSWORD
     os.system(mysql_install_secure)
 
 
@@ -346,6 +347,19 @@ if gitlab_install:
     os.system("sudo dpkg -i gitlab_7.8.4-omnibus-1_amd64.deb")
 
     os.system("sudo gitlab-ctl reconfigure")
+
+
+#################################################################
+# S3CMD Install (Amazon S3 Backup)
+#################################################################
+
+if s3cmd_install:
+    # Install S3CMD
+    os.system("apt-get -q -y install s3cmd")
+
+    # Set MySQL Password
+    s3cmd_setup_command = "sudo sh /scorpion/install/s3cmd_config.sh %s %s" % (AWS_AKID, AWS_SAK)
+    os.system(s3cmd_setup_command)
 
 
 #################################################################
