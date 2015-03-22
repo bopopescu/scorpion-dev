@@ -279,13 +279,18 @@ if postfix_install:
 
 if mysql_install:
     # Make installer non-interactive
-    os.system("export DEBIAN_FRONTEND=noninteractive")
+    #os.system("export DEBIAN_FRONTEND=noninteractive")
+    mysql_pass_command1 = "echo 'mysql-server mysql-server/root_password password %s' | sudo debconf-set-selections" % PASSWORD
+    mysql_pass_command2 = "echo 'mysql-server mysql-server/root_password_again password %s' | sudo debconf-set-selections" % PASSWORD
+    os.system(mysql_pass_command1)
+    os.system(mysql_pass_command2)
 
     # Install MySQL
     os.system("apt-get -q -y install mysql-server")
 
     # Set MySQL Password
-    os.system("mysqladmin -u root password %s") % PASSWORD
+    mysql_install_command = "mysqladmin -u root password %s" % PASSWORD
+    os.system(mysql_install_command)
 
     # Secure the MySQL installation
     os.system("sh /scorpion/install/mysql_secure.sh %s") % PASSWORD
