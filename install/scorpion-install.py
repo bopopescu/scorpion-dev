@@ -29,10 +29,6 @@ import argparse
 import os
 import subprocess
 
-import socket
-import fcntl
-import struct
-
 # Make input compatible with Python 3
 try: input = raw_input
 except NameError: pass
@@ -83,6 +79,7 @@ print('''
                    ()__()
                     '--'
 ''')
+
 
 #################################################################
 # Check Python and OS version
@@ -211,7 +208,7 @@ if set_ipv4:
 if set_ipv6:
     print('*' * 65)
     print " Setting IPv6 Address"
-    get_ipv6 = "/sbin/ifconfig eth0 | awk '/inet6 / { print $3;exit; }' | sed 's/addr:// '"
+    get_ipv6 = "ifconfig eth0 | awk '/inet6 / { print $3;exit; }' | sed 's/\/64// '"
     ipv6address = subprocess.check_output(get_ipv6, shell=True)
     ipv6address = ipv6address[:-1]
     set_ipv6_command = "echo %s %s %s >> /etc/hosts" % (ipv6address, FQDN, HOSTNAME)
@@ -227,6 +224,11 @@ if set_localhost:
     os.system(set_localhost_command)
     print " Set localhost with hostname %s." % HOSTNAME
     print('*' * 65)
+
+# Restart network interfaces
+os.system("ifdown -a")
+os.system("ifup -a")
+os.system("ifup eth0")
 
 
 #################################################################
