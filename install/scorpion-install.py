@@ -195,40 +195,16 @@ if set_hostname:
 # Set IP Address
 #################################################################
 
-def get_ip_address(ifname):
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    return socket.inet_ntoa(fcntl.ioctl(
-        s.fileno(),
-        0x8915,  # SIOCGIFADDR
-        struct.pack('256s', ifname[:15])
-    )[20:24])
-
-ipinfo = get_ip_address('eth0')
-#print ipinfo
-
-def get_ip6_address(ifname):
-    s = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
-    return socket.inet_ntoa(fcntl.ioctl(
-        s.fileno(),
-        0x8915,  # SIOCGIFADDR
-        struct.pack('256s', ifname[:15])
-    )[20:24])
-
-ip6info = get_ip6_address('eth0')
-print ip6info
-
 # Set the IPv4 Address
 if set_ipv4:
     print('*' * 65)
     print " Setting IPv4 Address"
-#    get_ipv4 = "/sbin/ifconfig eth0 | awk '/inet / { print $2 }' | sed 's/addr://'"
-#    ipv4address = os.system(get_ipv4)
-#    print "*****"
-#    print ipv4address
-#    print "*****"
-    set_ipv4_command = "echo %s %s %s >> /etc/hosts" % (ipinfo, FQDN, HOSTNAME)
+    get_ipv4 = "ifconfig eth0 | awk '/inet / { print $2 }' | sed 's/addr://'"
+    ipv4address = subprocess.check_output(get_ipv4, shell=True)
+    ipv4address = ipv4address[:-1]
+    set_ipv4_command = "echo %s %s %s >> /etc/hosts" % (ipv4address, FQDN, HOSTNAME)
     os.system(set_ipv4_command)
-    print " Set IPv4 to %s." % ipinfo
+    print " Set IPv4 to %s" % ipv4address
     print('*' * 65)
 
 # Set the IPv6 Address
@@ -236,10 +212,11 @@ if set_ipv6:
     print('*' * 65)
     print " Setting IPv6 Address"
     get_ipv6 = "/sbin/ifconfig eth0 | awk '/inet6 / { print $3;exit; }' | sed 's/addr:// '"
-    ipv6address = os.popen(get_ipv6).read()
+    ipv6address = subprocess.check_output(get_ipv6, shell=True)
+    ipv6address = ipv6address[:-1]
     set_ipv6_command = "echo %s %s %s >> /etc/hosts" % (ipv6address, FQDN, HOSTNAME)
     os.system(set_ipv6_command)
-    print " Set IPv6 to %s." % ipv6address
+    print " Set IPv6 to %s" % ipv6address
     print('*' * 65)
 
 # Set the localhost Address
