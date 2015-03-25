@@ -144,7 +144,6 @@ def installMessageStart(installMessage):
     print ""
 
 def installMessageEnd():
-    print " Done"
     print('*' * 65)
     print ""
 
@@ -210,7 +209,7 @@ if os_upgrade:
     installMessageStart("Updating OS")
 
     # Upgrade installed packages to latest versions
-    os.system("sudo apt-get -qq -y upgrade")
+    subprocess.call("sudo apt-get -qq -y upgrade", stdout=None, shell=True)
 
     installMessageEnd()
 
@@ -223,8 +222,8 @@ if set_hostname:
     installMessageStart("Updating Hostname")
 
     hostnameupdatestring = "echo %s > /etc/hostname" % HOSTNAME
-    os.system(hostnameupdatestring)
-    os.system("hostname -F /etc/hostname")
+    subprocess.call(hostnameupdatestring, stdout=None, shell=True)
+    subprocess.call("hostname -F /etc/hostname", stdout=None, shell=True)
 
     installMessageEnd()
 
@@ -237,15 +236,11 @@ if set_hostname:
 if set_ipv4:
     installMessageStart("Setting IPv4 Network Address")
 
-    print('*' * 65)
-    print " Setting IPv4 Address"
     get_ipv4 = "ifconfig eth0 | awk '/inet / { print $2 }' | sed 's/addr://'"
     ipv4address = subprocess.check_output(get_ipv4, shell=True)
     ipv4address = ipv4address[:-1]
     set_ipv4_command = "echo %s %s %s >> /etc/hosts" % (ipv4address, FQDN, HOSTNAME)
-    os.system(set_ipv4_command)
-    print " Set IPv4 to %s" % ipv4address
-    print('*' * 65)
+    subprocess.call(set_ipv4_command, stdout=None, shell=True)
 
     installMessageEnd()
 
@@ -253,15 +248,11 @@ if set_ipv4:
 if set_ipv6:
     installMessageStart("Setting IPv6 Network Address")
 
-    print('*' * 65)
-    print " Setting IPv6 Address"
     get_ipv6 = "ifconfig eth0 | awk '/inet6 / { print $3;exit; }' | sed 's/\/64// '"
     ipv6address = subprocess.check_output(get_ipv6, shell=True)
     ipv6address = ipv6address[:-1]
     set_ipv6_command = "echo %s %s %s >> /etc/hosts" % (ipv6address, FQDN, HOSTNAME)
-    os.system(set_ipv6_command)
-    print " Set IPv6 to %s" % ipv6address
-    print('*' * 65)
+    subprocess.call(set_ipv6_command, stdout=None, shell=True)
 
     installMessageEnd()
 
@@ -269,12 +260,8 @@ if set_ipv6:
 if set_localhost:
     installMessageStart("Setting localhost Network Address")
 
-    print('*' * 65)
-    print " Setting localhost Address"
     set_localhost_command = "echo 127.0.0.1 %s >> /etc/hosts" % HOSTNAME
-    os.system(set_localhost_command)
-    print " Set localhost with hostname %s." % HOSTNAME
-    print('*' * 65)
+    subprocess.call(set_localhost_command, stdout=None, shell=True)
 
     installMessageEnd()
 
@@ -282,11 +269,9 @@ if set_localhost:
 if restart_net_interfaces:
     installMessageStart("Restarting Network Interfaces")
 
-    print('*' * 65)
-    print " Setting localhost Address"
-    os.system("ifdown -a")
-    os.system("ifup -a")
-    os.system("ifup eth0")
+    subprocess.call("ifdown -a", stdout=None, shell=True)
+    subprocess.call("ifup -a", stdout=None, shell=True)
+    subprocess.call("ifup eth0", stdout=None, shell=True)
 
     installMessageEnd()
 
@@ -300,11 +285,11 @@ if not os.path.isdir("/scorpion"):
     installMessageStart("Installing Git and downloading Scorpion Core")
 
     # Install Git to version control scorpion core
-    os.system("apt-get -qq -y install git")
+    subprocess.call("apt-get -qq -y install git", stdout=None, shell=True)
     # Make the directory scorpion will reside
     os.makedirs("/scorpion")
     # Git clone the core
-    os.system("git clone https://github.com/scorpion/scorpion-dev.git /scorpion")
+    subprocess.call("git clone https://github.com/scorpion/scorpion-dev.git /scorpion", stdout=None, shell=True)
 
     installMessageEnd()
 
@@ -312,7 +297,7 @@ else:
     installMessageStart("Scorpion installed, updating core to latest version")
 
     # Folder exists, so just update
-    os.system("git -C /scorpion pull")
+    subprocess.call("git -C /scorpion pull", stdout=None, shell=True)
 
     installMessageEnd()
 
@@ -325,13 +310,13 @@ if postfix_install:
     installMessageStart("Installing Postfix")
 
     # Prestage postfix questions with default answers
-    os.system("echo 'postfix postfix/main_mailer_type select Internet Site' | debconf-set-selections")
-    os.system("echo 'postfix postfix/mailname string localhost' | debconf-set-selections")
-    os.system("echo 'postfix postfix/destinations string localhost.localdomain, localhost' | debconf-set-selections")
+    subprocess.call("echo 'postfix postfix/main_mailer_type select Internet Site' | debconf-set-selections", stdout=None, shell=True)
+    subprocess.call("echo 'postfix postfix/mailname string localhost' | debconf-set-selections", stdout=None, shell=True)
+    subprocess.call("echo 'postfix postfix/destinations string localhost.localdomain, localhost' | debconf-set-selections", stdout=None, shell=True)
 
     # Kick off the install
-    os.system("apt-get -qq -y install postfix")
-    os.system("/usr/sbin/postconf -e 'inet_interfaces = loopback-only'")
+    subprocess.call("apt-get -qq -y install postfix", stdout=None, shell=True)
+    subprocess.call("/usr/sbin/postconf -e 'inet_interfaces = loopback-only'", stdout=None, shell=True)
 
     installMessageEnd()
 
@@ -346,19 +331,19 @@ if mysql_install:
     # Make installer non-interactive
     mysql_pass_command1 = "echo 'mysql-server mysql-server/root_password password %s' | sudo debconf-set-selections" % PASSWORD
     mysql_pass_command2 = "echo 'mysql-server mysql-server/root_password_again password %s' | sudo debconf-set-selections" % PASSWORD
-    os.system(mysql_pass_command1)
-    os.system(mysql_pass_command2)
+    subprocess.call(mysql_pass_command1, stdout=None, shell=True)
+    subprocess.call(mysql_pass_command2, stdout=None, shell=True)
 
     # Install MySQL
-    os.system("apt-get -qq -y install mysql-server")
+    subprocess.call("apt-get -qq -y install mysql-server")
 
     # Set MySQL Password
     mysql_password_set = "mysqladmin -u root password %s" % PASSWORD
-    os.system(mysql_password_set)
+    subprocess.call(mysql_password_set, stdout=None, shell=True)
 
     # Secure the MySQL installation
     mysql_install_secure = "sudo sh /scorpion/install/mysql_secure.sh %s" % PASSWORD
-    os.system(mysql_install_secure)
+    subprocess.call(mysql_install_secure, stdout=None, shell=True)
 
     installMessageEnd()
 
@@ -371,10 +356,10 @@ if php_install:
     installMessageStart("Installing PHP")
 
     # Install PHP
-    os.system("apt-get -qq -y install php5-fpm php5-cli php5-curl php5-gd php5-mcrypt php5-mysql php5-sqlite php-apc php-pear php5-tidy php5-imap")
+    subprocess.call("apt-get -qq -y install php5-fpm php5-cli php5-curl php5-gd php5-mcrypt php5-mysql php5-sqlite php-apc php-pear php5-tidy php5-imap", stdout=None, shell=True)
 
     # Fix PHP5-IMAP extension by creating symbolic link
-    os.system("sudo ln -s ../../mods-available/imap.ini /etc/php5/fpm/conf.d/20-imap.ini")
+    subprocess.call("sudo ln -s ../../mods-available/imap.ini /etc/php5/fpm/conf.d/20-imap.ini", stdout=None, shell=True)
 
     # Fix 502 Bad Gateway
     #sed -i 's@listen = /var/run/php5-fpm.sock@listen = 127.0.0.1:9000@g' /etc/php5/fpm/pool.d/www.conf
@@ -387,10 +372,10 @@ if php_install:
 #################################################################
 
 if nginx_install:
-    installMessageStart("Installing PHP")
+    installMessageStart("Installing Nginx")
 
     # Installo Nginx
-    os.system("apt-get -qq -y install nginx")
+    subprocess.call("apt-get -qq -y install nginx", stdout=None, shell=True)
 
     installMessageEnd()
 
@@ -403,7 +388,7 @@ if apache_install:
     installMessageStart("Installing Apache")
 
     # Install Apache
-    os.system("apt-get -qq -y install apache")
+    subprocess.call("apt-get -qq -y install apache2", stdout=None, shell=True)
 
     installMessageEnd()
 
@@ -416,7 +401,7 @@ if supporting_software_install:
     installMessageStart("Installing Supporting Software")
 
     # Install Supporting Software
-    os.system("apt-get -qq -y install htop imagemagick iftop mytop iptraf nmon lynx nmap screen monit mutt")
+    subprocess.call("apt-get -qq -y install htop imagemagick iftop mytop iptraf nmon lynx nmap screen monit mutt", stdout=None, shell=True)
 
     installMessageEnd()
 
@@ -430,15 +415,15 @@ if gitlab_install:
     installMessageStart("Installing Supporting Software")
 
     # Install required pre-requisites
-    os.system("apt-get -qq -y install openssh-server")
-    os.system("apt-get -qq -y install postfix")
+    subprocess.call("apt-get -qq -y install openssh-server", stdout=None, shell=True)
+    subprocess.call("apt-get -qq -y install postfix")
 
     # Download and install Gitlab
-    os.system("wget https://downloads-packages.s3.amazonaws.com/ubuntu-14.04/gitlab_7.8.4-omnibus-1_amd64.deb")
-    os.system("sudo dpkg -i gitlab_7.8.4-omnibus-1_amd64.deb")
+    subprocess.call("wget https://downloads-packages.s3.amazonaws.com/ubuntu-14.04/gitlab_7.8.4-omnibus-1_amd64.deb", stdout=None, shell=True)
+    subprocess.call("sudo dpkg -i gitlab_7.8.4-omnibus-1_amd64.deb", stdout=None, shell=True)
 
     # Configure Gitlab
-    os.system("sudo gitlab-ctl reconfigure")
+    subprocess.call("sudo gitlab-ctl reconfigure", stdout=None, shell=True)
 
     installMessageEnd()
 
@@ -451,11 +436,11 @@ if s3cmd_install:
     installMessageStart("Installing S3CMD")
 
     # Install S3CMD
-    os.system("apt-get -qq -y install s3cmd")
+    subprocess.call("apt-get -qq -y install s3cmd", stdout=None, shell=True)
 
     # Set MySQL Password
     s3cmd_setup_command = "sudo sh /scorpion/install/s3cmd_config.sh %s %s" % (AWS_AKID, AWS_SAK)
-    os.system(s3cmd_setup_command)
+    subprocess.call(s3cmd_setup_command, stdout=None, shell=True)
 
     installMessageEnd()
 
@@ -464,13 +449,16 @@ if s3cmd_install:
 # Post Install Cleanup
 #################################################################
 
+# Remove installer file
+try:
+    os.remove('scorpion-install.py')
+except OSError:
+    pass
+
+# Print install complete message
 print ""
 print ""
 print ""
 print ""
 print('Scorpion Install Complete!')
-
-try:
-    os.remove('scorpion-install.py')
-except OSError:
-    pass
+print ""
