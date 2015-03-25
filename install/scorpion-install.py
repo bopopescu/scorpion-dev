@@ -280,7 +280,7 @@ if set_localhost:
 
 # Restart network interfaces
 if restart_net_interfaces:
-    installMessageStart("Restarting Network Interfaces")`
+    installMessageStart("Restarting Network Interfaces")
 
     print('*' * 65)
     print " Setting localhost Address"
