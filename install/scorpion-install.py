@@ -144,6 +144,7 @@ def installMessageStart(installMessage):
     print ""
 
 def installMessageEnd():
+    print " Done"
     print('*' * 65)
     print ""
 
@@ -335,7 +336,7 @@ if mysql_install:
     subprocess.call(mysql_pass_command2, stdout=None, shell=True)
 
     # Install MySQL
-    subprocess.call("apt-get -qq -y install mysql-server")
+    subprocess.call("apt-get -qq -y install mysql-server", stdout=None, shell=True)
 
     # Set MySQL Password
     mysql_password_set = "mysqladmin -u root password %s" % PASSWORD
