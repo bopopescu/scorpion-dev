@@ -61,7 +61,7 @@ mysql_install = True
 nginx_install = True
 apache_install = True
 php_install = True
-gunicorn_install == True
+gunicorn_install = True
 supporting_software_install = True
 gitlab_install = False
 s3cmd_install = True
