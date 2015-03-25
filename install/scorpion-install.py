@@ -58,12 +58,13 @@ restart_net_interfaces = True
 scorpion_install = True
 postfix_install = True
 mysql_install = True
-php_install = True
 nginx_install = True
+apache_install = True
+php_install = True
+gunicorn_install == True
 supporting_software_install = True
 gitlab_install = False
 s3cmd_install = True
-apache_install = True
 
 
 #################################################################
@@ -350,25 +351,6 @@ if mysql_install:
 
 
 #################################################################
-# PHP Install
-#################################################################
-
-if php_install:
-    installMessageStart("Installing PHP")
-
-    # Install PHP
-    subprocess.call("apt-get -qq -y install php5-fpm php5-cli php5-curl php5-gd php5-mcrypt php5-mysql php5-sqlite php-apc php-pear php5-tidy php5-imap", stdout=None, shell=True)
-
-    # Fix PHP5-IMAP extension by creating symbolic link
-    subprocess.call("sudo ln -s ../../mods-available/imap.ini /etc/php5/fpm/conf.d/20-imap.ini", stdout=None, shell=True)
-
-    # Fix 502 Bad Gateway
-    #sed -i 's@listen = /var/run/php5-fpm.sock@listen = 127.0.0.1:9000@g' /etc/php5/fpm/pool.d/www.conf
-
-    installMessageEnd()
-
-
-#################################################################
 # NGINX Install
 #################################################################
 
@@ -390,6 +372,38 @@ if apache_install:
 
     # Install Apache
     subprocess.call("apt-get -qq -y install apache2", stdout=None, shell=True)
+
+    installMessageEnd()
+
+
+#################################################################
+# PHP Install
+#################################################################
+
+if php_install:
+    installMessageStart("Installing PHP")
+
+    # Install PHP
+    subprocess.call("apt-get -qq -y install php5 php5-cli php5-curl php5-gd php5-mcrypt php5-mysql php5-sqlite php-apc php-pear php5-tidy php5-imap", stdout=None, shell=True)
+
+    # Fix PHP5-IMAP extension by creating symbolic link
+    subprocess.call("sudo ln -s ../../mods-available/imap.ini /etc/php5/fpm/conf.d/20-imap.ini", stdout=None, shell=True)
+
+    # Fix 502 Bad Gateway
+    #sed -i 's@listen = /var/run/php5-fpm.sock@listen = 127.0.0.1:9000@g' /etc/php5/fpm/pool.d/www.conf
+
+    installMessageEnd()
+
+
+#################################################################
+# Gunicorn Install
+#################################################################
+
+if gunicorn_install:
+    installMessageStart("Installing Gunicorn")
+
+    # Install Apache
+    subprocess.call("apt-get -qq -y install gunicorn", stdout=None, shell=True)
 
     installMessageEnd()
 
