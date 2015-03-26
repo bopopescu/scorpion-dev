@@ -384,6 +384,10 @@ if apache_install:
     # Copy proper Apache ports
     shutil.copyfile('/scorpion/install/ports.conf', '/etc/apache2/ports.conf')
 
+    # Need to set the "AllowOverride All" in apache2.conf  Copy perhaps?  Sed AllowOverride None to All?
+    # awk '/<Directory \/var\/www\/>/,/AllowOverride None/{sub("None", "All",$0)}{print}' ???
+    # sed '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride all/' httpd.conf ???
+
     # Restart Apache
     subprocess.call("service apache2 restart", stdout=None, shell=True)
 
@@ -439,6 +443,21 @@ if ioncube_install:
     shutil.rmtree('ioncube')
 
     installMessageEnd()
+
+
+#################################################################
+# PHP FPM Information
+#################################################################
+# 
+# apt-get install php5-fpm
+# sudo sed -i "s/listen =.*/listen = 127.0.0.1:9000/" /etc/php5/fpm/pool.d/www.conf
+# apt-get install libapache2-mod-fastcgi
+# sudo a2enmod proxy_fcgi
+#
+#### This should go into the virtual host file.
+# ProxyPassMatch ^/(.*\.php(/.*)?)$ fcgi://127.0.0.1:9000/var/www/html/$1
+#
+# sudo service apache2 restart
 
 
 #################################################################
