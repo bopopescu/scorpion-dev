@@ -526,7 +526,7 @@ if firewall_setup:
     installMessageStart("Setting up firewall and port rules")
 
     # Enable the firewall
-    subprocess.call("ufw enable", stdout=None, shell=True)
+    subprocess.call("ufw --force enable", stdout=None, shell=True)
 
     # Set SSH, HTTP, and HTTPS as allowed on the system.
     # Block all other connections in and out.
