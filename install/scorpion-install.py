@@ -27,7 +27,10 @@
 # Python module imports
 import argparse
 import os
+import shutil
 import subprocess
+import tarfile
+import urllib
 
 # Make input compatible with Python 3
 try: input = raw_input
@@ -61,10 +64,15 @@ mysql_install = True
 nginx_install = True
 apache_install = True
 php_install = True
+ioncube_install = True
 gunicorn_install = True
 supporting_software_install = True
 gitlab_install = False
 s3cmd_install = True
+
+# Security Related
+fail2ban_install = True
+firewall_setup = True
 
 
 #################################################################
@@ -373,6 +381,12 @@ if apache_install:
     # Install Apache
     subprocess.call("apt-get -qq -y install apache2", stdout=None, shell=True)
 
+    # Copy proper Apache ports
+    shutil.copyfile('/scorpion/install/ports.conf', '/etc/apache2/ports.conf')
+
+    # Restart Apache
+    subprocess.call("service apache2 restart", stdout=None, shell=True)
+
     installMessageEnd()
 
 
@@ -391,6 +405,38 @@ if php_install:
 
     # Fix 502 Bad Gateway
     #sed -i 's@listen = /var/run/php5-fpm.sock@listen = 127.0.0.1:9000@g' /etc/php5/fpm/pool.d/www.conf
+
+    installMessageEnd()
+
+
+#################################################################
+# Ioncube Install
+#################################################################
+
+if ioncube_install:
+    installMessageStart("Installing Ioncube")
+
+    # Download the ioncube loader for PHP
+    urllib.urlretrieve('http://downloads3.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz','ioncube_loaders_lin_x86-64.tar.gz')
+
+    # Extract the tar
+    tar = tarfile.open("ioncube_loaders_lin_x86-64.tar.gz")
+    tar.extractall()
+    tar.close()
+
+    # Copy / Install the PHP 5.5 version
+    shutil.copyfile('ioncube/ioncube_loader_lin_5.5.so', '/usr/lib/php5/20121212/ioncube_loader_lin_5.5.so')
+
+    # Add the extension to the php.ini file for both apache and cli
+    subprocess.call("echo 'zend_extension = /usr/lib/php5/20121212/ioncube_loader_lin_5.5.so' >> /etc/php5/apache2/php.ini", stdout=None, shell=True)
+    subprocess.call("echo 'zend_extension = /usr/lib/php5/20121212/ioncube_loader_lin_5.5.so' >> /etc/php5/cli/php.ini", stdout=None, shell=True)
+
+    # Restart apache to make the change take affect
+    subprocess.call("service apache2 restart", stdout=None, shell=True)
+
+    # Cleanup - Remove the tar and the extracted contents
+    os.remove('ioncube_loaders_lin_x86-64.tar.gz')
+    shutil.rmtree('ioncube')
 
     installMessageEnd()
 
@@ -456,6 +502,37 @@ if s3cmd_install:
     # Set MySQL Password
     s3cmd_setup_command = "sudo sh /scorpion/install/s3cmd_config.sh %s %s" % (AWS_AKID, AWS_SAK)
     subprocess.call(s3cmd_setup_command, stdout=None, shell=True)
+
+    installMessageEnd()
+
+
+#################################################################
+# Fail2ban Install
+#################################################################
+
+if fail2ban_install:
+    installMessageStart("Installing Fail2Ban")
+
+    subprocess.call("apt-get -qq -y install fail2ban", stdout=None, shell=True)
+
+    installMessageEnd()
+
+
+#################################################################
+# Firewall setup
+#################################################################
+
+if firewall_setup:
+    installMessageStart("Setting up firewall and port rules")
+
+    # Enable the firewall
+    subprocess.call("ufw enable", stdout=None, shell=True)
+
+    # Set SSH, HTTP, and HTTPS as allowed on the system.
+    # Block all other connections in and out.
+    subprocess.call("ufw allow 22/tcp", stdout=None, shell=True)
+    subprocess.call("ufw allow 80/tcp", stdout=None, shell=True)
+    subprocess.call("ufw allow 443/tcp", stdout=None, shell=True)
 
     installMessageEnd()
 
